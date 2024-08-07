@@ -1,0 +1,43 @@
+name: Build Minecraft Executable with Forge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+
+      - name: Download Forge JAR
+        run: |
+          mkdir -p build/
+          wget -O build/1.16.5-Forge.jar https://github.com/fxlgm/j9build/releases/download/nead/1.16.5-Forge.jar
+
+      - name: Create Minecraft JAR
+        run: |
+          cp build/1.16.5-Forge.jar build/minecraft.jar
+          # No OptiFine, so just copy Forge JAR
+
+      - name: Install JPackage
+        run: sudo apt-get install -y openjdk-8-jdk
+
+      - name: Create .exe file
+        run: |
+          jpackage --input build/ --name minecraft --main-jar minecraft.jar --main-class net.minecraft.client.Minecraft --type exe --dest build/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: minecraft-executable
+          path: build/minecraft.exe

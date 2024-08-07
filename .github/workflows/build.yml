@@ -1,15 +1,27 @@
-name: Gitea
-run-name: Test
+name: Build
 on:
   push:
-  workflow_dispatch:
+  pull_request:
 
 jobs:
-  Explore-Gitea-Action:
-    runs-on: ubuntu-latest
+  Build:
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: 检出仓库
+        uses: actions/checkout@v4
+      - name: 下载 Graalvm
+        run: |
+          wget -O $RUNNER_TEMP/java_package.tar.gz https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-x64_bin.tar.gz          
+      - name: 安装 Graalvm
+        uses: actions/setup-java@v4
         with:
-          distribution: 'adopt-openj9' # See 'Supported distributions' for available options
+          distribution: 'jdkfile'
+          jdkFile: ${{ runner.temp }}/java_package.tar.gz
           java-version: '21'
+          architecture: x64
+      - name: 下载 Minecraft client
+        run: wget -O client.jar https://bmclapi2.bangbang93.com/version/1.20.4/client
+      - name: 创建本机可执行文件
+        run: |
+          native-image -Xmx3G -jar client.jar          
+      

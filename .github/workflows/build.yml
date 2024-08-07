@@ -17,7 +17,7 @@ jobs:
         run: |
           sudo add-apt-repository ppa:openjdk-r/ppa
           sudo apt-get update
-          sudo apt-get install -y openjdk-8-jdk wget
+          sudo apt-get install -y openjdk-8-jdk curl
 
       - name: Download Forge JAR
         run: |
@@ -26,7 +26,7 @@ jobs:
 
       - name: Download Launch4j
         run: |
-          wget -O launch4j.zip https://sourceforge.net/projects/launch4j/files/latest/download
+          curl -L -o launch4j.zip https://sourceforge.net/projects/launch4j/files/latest/download
           unzip launch4j.zip -d launch4j
           # Ensure `launch4j` is executable
           chmod +x launch4j/launch4j

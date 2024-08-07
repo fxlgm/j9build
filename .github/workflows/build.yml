@@ -1,4 +1,4 @@
-name: Build Minecraft Executable
+name: Build Minecraft Launcher
 
 on:
   push:
@@ -10,37 +10,27 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+    - name: Download Minecraft Files
+      run: Invoke-WebRequest -Uri "https://github.com/fxlgm/j9build/releases/download/Neadnew/mc.zip" -OutFile "mc.zip"
 
-      - name: Create build directory
-        run: |
-          New-Item -Path build -ItemType Directory -Force
+    - name: Extract Minecraft Files
+      run: Expand-Archive -Path "mc.zip" -DestinationPath "build" -Force
 
-      - name: Download Minecraft JAR
-        run: |
-          Invoke-WebRequest -Uri "https://github.com/fxlgm/j9build/releases/download/nead/1.16.5-Forge.jar" -OutFile "build/1.16.5-Forge.jar"
+    - name: Setup JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-      - name: Verify jpackage installation
-        run: |
-          jpackage --version
+    - name: Build Executable with jpackage
+      run: |
+        jpackage --input build --name Minecraft --main-jar 1.16.5-Forge.jar --main-class net.minecraft.client.Minecraft --type exe --dest build
 
-      - name: Build Executable
-        run: |
-          jpackage --input build --name Minecraft --main-jar 1.16.5-Forge.jar --main-class net.minecraft.client.Minecraft --type exe --dest build --verbose
-
-      - name: List build directory
-        run: |
-          Get-ChildItem -Path build
-
-      - name: Upload Executable
-        uses: actions/upload-artifact@v3
-        with:
-          name: minecraft-executable
-          path: build/Minecraft-1.0.exe
+    - name: Upload Executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: minecraft-executable
+        path: build/Minecraft.exe

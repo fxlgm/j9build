@@ -30,7 +30,9 @@ jobs:
           # No OptiFine, so just copy Forge JAR
 
       - name: Install JPackage
-        run: sudo apt-get install -y openjdk-8-jdk
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-8-jdk
 
       - name: Create .exe file
         run: |

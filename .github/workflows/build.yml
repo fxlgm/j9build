@@ -17,7 +17,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'  # Specify the JDK distribution (e.g., 'temurin', 'zulu', 'adopt-openjdk', etc.)
+          distribution: 'temurin'
+
+      - name: Create build directory
+        run: |
+          New-Item -Path build -ItemType Directory -Force
 
       - name: Download Minecraft JAR
         run: |

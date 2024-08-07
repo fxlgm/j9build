@@ -1,4 +1,4 @@
-name: Build Minecraft Executable with Forge
+name: Build Minecraft Executable
 
 on:
   push:
@@ -7,53 +7,33 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up JDK 8
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'  # Ensure this is JDK 14 or higher
+      
+      - name: Download Minecraft JAR
         run: |
-          sudo add-apt-repository ppa:openjdk-r/ppa
-          sudo apt-get update
-          sudo apt-get install -y openjdk-8-jdk curl
+          Invoke-WebRequest -Uri "https://github.com/fxlgm/j9build/releases/download/nead/1.16.5-Forge.jar" -OutFile "build/1.16.5-Forge.jar"
 
-      - name: Download Forge JAR
+      - name: Build Executable
         run: |
-          mkdir -p build/
-          wget -O build/1.16.5-Forge.jar https://github.com/fxlgm/j9build/releases/download/nead/1.16.5-Forge.jar
+          jpackage \
+            --input build \
+            --name Minecraft \
+            --main-jar 1.16.5-Forge.jar \
+            --main-class net.minecraft.client.Minecraft \
+            --type exe \
+            --dest build
 
-      - name: Download Launch4j
-        run: |
-          curl -L -o launch4j.zip https://sourceforge.net/projects/launch4j/files/latest/download
-          unzip launch4j.zip -d launch4j
-          # Ensure `launch4j` is executable
-          chmod +x launch4j/launch4j
-
-      - name: Create Launch4j Configuration
-        run: |
-          echo '<?xml version="1.0" encoding="UTF-8"?>
-          <launch4jconfig>
-            <header>
-              <image></image>
-              <icon></icon>
-              <jar>build/minecraft.jar</jar>
-              <outfile>build/minecraft.exe</outfile>
-              <errTitle>Minecraft</errTitle>
-              <cmdLine></cmdLine>
-              <chdir></chdir>
-              <downloadUrl></downloadUrl>
-              <supportUrl></supportUrl>
-            </header>
-          </launch4jconfig>' > launch4j-config.xml
-
-      - name: Build Executable with Launch4j
-        run: |
-          launch4j/launch4j launch4j-config.xml
-
-      - name: Upload build artifacts
+      - name: Upload Executable
         uses: actions/upload-artifact@v3
         with:
           name: minecraft-executable
-          path: build/minecraft.exe
+          path: build/Minecraft.exe

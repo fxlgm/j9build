@@ -23,5 +23,5 @@ jobs:
         run: wget -O client.jar https://bmclapi2.bangbang93.com/version/1.20.4/client
       - name: 创建本机可执行文件
         run: |
-          native-image -Xmx 3G -jar client.jar          
+          native-image -jar client.jar          
       

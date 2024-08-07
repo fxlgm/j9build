@@ -43,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: minecraft-executable
-          path: build/Minecraft.exe
+          path: build/Minecraft-1.0.exe

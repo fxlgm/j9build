@@ -16,8 +16,9 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '17'  # Ensure this is JDK 14 or higher
-      
+          java-version: '17'
+          distribution: 'temurin'  # Specify the JDK distribution (e.g., 'temurin', 'zulu', 'adopt-openjdk', etc.)
+
       - name: Download Minecraft JAR
         run: |
           Invoke-WebRequest -Uri "https://github.com/fxlgm/j9build/releases/download/nead/1.16.5-Forge.jar" -OutFile "build/1.16.5-Forge.jar"

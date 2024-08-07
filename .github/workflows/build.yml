@@ -14,29 +14,43 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up JDK 8
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'temurin'
+        run: |
+          sudo add-apt-repository ppa:openjdk-r/ppa
+          sudo apt-get update
+          sudo apt-get install -y openjdk-8-jdk wget
 
       - name: Download Forge JAR
         run: |
           mkdir -p build/
           wget -O build/1.16.5-Forge.jar https://github.com/fxlgm/j9build/releases/download/nead/1.16.5-Forge.jar
 
-      - name: Create Minecraft JAR
+      - name: Download Launch4j
         run: |
-          cp build/1.16.5-Forge.jar build/minecraft.jar
-          # No OptiFine, so just copy Forge JAR
+          wget -O launch4j.zip https://sourceforge.net/projects/launch4j/files/latest/download
+          unzip launch4j.zip -d launch4j
+          # Ensure `launch4j` is executable
+          chmod +x launch4j/launch4j
 
-      - name: Install JPackage
+      - name: Create Launch4j Configuration
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-8-jdk
+          echo '<?xml version="1.0" encoding="UTF-8"?>
+          <launch4jconfig>
+            <header>
+              <image></image>
+              <icon></icon>
+              <jar>build/minecraft.jar</jar>
+              <outfile>build/minecraft.exe</outfile>
+              <errTitle>Minecraft</errTitle>
+              <cmdLine></cmdLine>
+              <chdir></chdir>
+              <downloadUrl></downloadUrl>
+              <supportUrl></supportUrl>
+            </header>
+          </launch4jconfig>' > launch4j-config.xml
 
-      - name: Create .exe file
+      - name: Build Executable with Launch4j
         run: |
-          jpackage --input build/ --name minecraft --main-jar minecraft.jar --main-class net.minecraft.client.Minecraft --type exe --dest build/
+          launch4j/launch4j launch4j-config.xml
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3

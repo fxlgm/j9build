@@ -27,9 +27,17 @@ jobs:
         run: |
           Invoke-WebRequest -Uri "https://github.com/fxlgm/j9build/releases/download/nead/1.16.5-Forge.jar" -OutFile "build/1.16.5-Forge.jar"
 
+      - name: Verify jpackage installation
+        run: |
+          jpackage --version
+
       - name: Build Executable
         run: |
-          jpackage --input build --name Minecraft --main-jar 1.16.5-Forge.jar --main-class net.minecraft.client.Minecraft --type exe --dest build
+          jpackage --input build --name Minecraft --main-jar 1.16.5-Forge.jar --main-class net.minecraft.client.Minecraft --type exe --dest build --verbose
+
+      - name: List build directory
+        run: |
+          Get-ChildItem -Path build
 
       - name: Upload Executable
         uses: actions/upload-artifact@v3
